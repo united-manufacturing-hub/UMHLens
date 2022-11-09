@@ -34,7 +34,7 @@ if (Test-CommandExists "npm")
         Write-Output "✅ rimraf already installed"
     }
 }else{
-    Write-Output "❌ npm not found, skipping optional dependencies"
+    Write-Output "⚠️ npm not found, skipping optional dependencies"
 }
 
 # Remove old build
@@ -62,7 +62,7 @@ if (Test-Path "cache")
     Move-Item -Path node_modules -Destination lens/node_modules -Recurse -Force
     Write-Output "    ✅ Cache restored"
 }else{
-    Write-Output "    ℹ️ Cache not found"
+    Write-Output "    ⚠️ Cache not found"
 }
 
 # Build Lens
