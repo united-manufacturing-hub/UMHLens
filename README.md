@@ -1,4 +1,4 @@
-# UMH-Lens
+# UMHLens
 
 This repo contains the build script, to build & sign [Lens](https://github.com/lensapp/lens).
 
@@ -15,3 +15,11 @@ The produced binaries are functionally identical to [OpenLens](https://github.co
 ## License
 
 This repo is licensed under the [MIT license](LICENSE.md).
+
+## United Manufacturing Hub
+
+If you are using Kubernetes in Manufacturing or Industrial IoT, check out the [United Manufacturing Hub](https://learn.umh.app). The UMH is a tool to setup and maintain your entire IT / OT infrastructure.
+
+## Contact
+
+[UMH Systems GmbH](https://www.umh.app)
