@@ -1,0 +1,111 @@
+# Partially copied from https://github.com/MuhammedKalkan/UMHLens/blob/main/.github/workflows/main.yml
+
+name: Build Lens
+'on':
+  push:
+    tags:
+      - v*.*.*
+jobs:
+  build:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+    runs-on: '${{ matrix.os }}'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.0.2
+      - name: Export tag to variable
+        run: echo "TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+        shell: bash
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.16.0
+      - name: Update Lens
+        run: |
+          git clone https://github.com/lensapp/lens.git
+          git checkout v${{ env.TAG }}
+          cp update.js lens/update.js
+          cd lens
+          node update.js
+      - name: Build Lens
+        run: |
+          mkdir releasefiles
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            if [ "${CSC_LINK}" = "" ]; then
+              unset CSC_LINK
+            fi
+
+            if [ "${CSC_KEY_PASSWORD}" = "" ]; then
+              unset CSC_KEY_PASSWORD
+            fi
+
+            env ELECTRON_BUILDER_EXTRA_ARGS="--arm64 --x64 --config.dmg.sign=false" make build
+            for file in dist/UMHLens-${{ env.TAG }}-latest.*.dmg; do
+              if [[ "$file" == *"arm64"* ]]; then
+                cp "$file" releasefiles/UMHLens-${{ env.TAG }}-arm64.dmg
+              else
+                cp "$file" releasefiles/UMHLens-${{ env.TAG }}.dmg
+              fi
+            done
+            for file in dist/UMHLens-${{ env.TAG }}-latest.*.zip; do
+              if [[ "$file" == *"arm64"* ]]; then
+                cp "$file" releasefiles/UMHLens-${{ env.TAG }}-arm64.zip
+              else
+                cp "$file" releasefiles/UMHLens-${{ env.TAG }}.zip
+              fi
+            done
+          elif [ "$RUNNER_OS" == "Linux" ]; then
+            env ELECTRON_BUILDER_EXTRA_ARGS="--x64 --arm64" make build
+            cp dist/UMHLens-${{ env.TAG }}-latest.*.x86_64.AppImage releasefiles/UMHLens-${{ env.TAG }}.AppImage
+            cp dist/UMHLens-${{ env.TAG }}-latest.*.amd64.deb releasefiles/UMHLens-${{ env.TAG }}.deb
+            cp dist/UMHLens-${{ env.TAG }}-latest.*.x86_64.rpm releasefiles/UMHLens-${{ env.TAG }}.rpm
+            cp dist/UMHLens-${{ env.TAG }}-latest.*.arm64.AppImage releasefiles/UMHLens-${{ env.TAG }}.arm64.AppImage
+            cp dist/UMHLens-${{ env.TAG }}-latest.*.arm64.deb releasefiles/UMHLens-${{ env.TAG }}.arm64.deb
+            cp dist/UMHLens-${{ env.TAG }}-latest.*.aarch64.rpm releasefiles/UMHLens-${{ env.TAG }}.arm64.rpm
+          fi
+        shell: bash
+        working-directory: lens
+      - name: Calculate SHA256 checksum
+        run: |
+          for filename in UMHLens-${{ env.TAG }}*; do shasum -a 256 ${filename} | tee ${filename}.sha256 ; done
+        shell: bash
+        working-directory: lens/releasefiles
+      - uses: actions/upload-artifact@v3
+        if: github.ref != 'refs/heads/main'
+        with:
+          name: 'UMHLens-${{ matrix.os }}'
+          retention-days: 5
+          path: |
+            lens/releasefiles/UMHLens-${{ env.TAG }}*.dmg
+            lens/releasefiles/UMHLens-${{ env.TAG }}*.AppImage
+            lens/releasefiles/UMHLens-${{ env.TAG }}*.deb
+            lens/releasefiles/UMHLens-${{ env.TAG }}*.rpm
+            lens/releasefiles/UMHLens-${{ env.TAG }}*.zip
+            lens/releasefiles/UMHLens-${{ env.TAG }}*.sha256
+      - name: Release
+        uses: softprops/action-gh-release@v0.1.14
+        if: github.ref == 'refs/heads/main'
+        with:
+          tag_name: 'v${{ env.TAG }}'
+          files: |
+            lens/releasefiles/UMHLens-${{ env.TAG }}*.dmg
+            lens/releasefiles/UMHLens-${{ env.TAG }}*.AppImage
+            lens/releasefiles/UMHLens-${{ env.TAG }}*.deb
+            lens/releasefiles/UMHLens-${{ env.TAG }}*.rpm
+            lens/releasefiles/UMHLens-${{ env.TAG }}*.zip
+            lens/releasefiles/UMHLens-${{ env.TAG }}*.sha256
+      - name: Latest
+        uses: softprops/action-gh-release@v0.1.14
+        if: github.ref == 'refs/heads/main'
+        with:
+          draft: true
+          tag_name: latest
+          files: |
+            lens/dist/UMHLens*.dmg
+            lens/dist/UMHLens*.AppImage
+            lens/dist/UMHLens*.deb
+            lens/dist/UMHLens*.rpm
+            lens/dist/UMHLens*.zip
+            lens/dist/latest*.yml
