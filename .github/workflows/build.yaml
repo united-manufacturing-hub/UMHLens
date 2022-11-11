@@ -59,12 +59,12 @@ jobs:
           elif [ "$RUNNER_OS" == "Linux" ]; then
             env ELECTRON_BUILDER_EXTRA_ARGS="--x64 --arm64" make build
             ls -lah dist
-            cp dist/UMHLens-${{ env.TAG }}-latest.*.x86_64.AppImage releasefiles/UMHLens-${{ env.TAG }}.AppImage
-            cp dist/UMHLens-${{ env.TAG }}-latest.*.amd64.deb releasefiles/UMHLens-${{ env.TAG }}.deb
-            cp dist/UMHLens-${{ env.TAG }}-latest.*.x86_64.rpm releasefiles/UMHLens-${{ env.TAG }}.rpm
-            cp dist/UMHLens-${{ env.TAG }}-latest.*.arm64.AppImage releasefiles/UMHLens-${{ env.TAG }}.arm64.AppImage
-            cp dist/UMHLens-${{ env.TAG }}-latest.*.arm64.deb releasefiles/UMHLens-${{ env.TAG }}.arm64.deb
-            cp dist/UMHLens-${{ env.TAG }}-latest.*.aarch64.rpm releasefiles/UMHLens-${{ env.TAG }}.arm64.rpm
+            cp dist/UMHLens-v${{ env.TAG }}-latest.*.x86_64.AppImage releasefiles/UMHLens-${{ env.TAG }}.AppImage
+            cp dist/UMHLens-v${{ env.TAG }}-latest.*.amd64.deb releasefiles/UMHLens-${{ env.TAG }}.deb
+            cp dist/UMHLens-v${{ env.TAG }}-latest.*.x86_64.rpm releasefiles/UMHLens-${{ env.TAG }}.rpm
+            cp dist/UMHLens-v${{ env.TAG }}-latest.*.arm64.AppImage releasefiles/UMHLens-${{ env.TAG }}.arm64.AppImage
+            cp dist/UMHLens-v${{ env.TAG }}-latest.*.arm64.deb releasefiles/UMHLens-${{ env.TAG }}.arm64.deb
+            cp dist/UMHLens-v${{ env.TAG }}-latest.*.aarch64.rpm releasefiles/UMHLens-${{ env.TAG }}.arm64.rpm
           fi
         shell: bash
         working-directory: lens
