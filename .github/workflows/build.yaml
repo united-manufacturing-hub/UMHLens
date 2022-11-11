@@ -25,9 +25,9 @@ jobs:
       - name: Update Lens
         run: |
           git clone https://github.com/lensapp/lens.git
-          git checkout ${{ env.TAG }}
           cp update.js lens/update.js
           cd lens
+          git checkout ${{ env.TAG }}
           node update.js
       - name: Build Lens
         run: |
