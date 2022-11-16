@@ -107,7 +107,7 @@ if (Test-Path "$pwd\lens") {
     Write-Output "❌ Lens repo is not cloned"
     # Clone repo
     Write-Output "🔍 Cloning Lens repo"
-    git clone --depth 1 --branch $version https://github.com/lensapp/lens.git
+    git clone https://github.com/lensapp/lens.git
     if ($?)
     {
         Write-Output "✅ Lens repo cloned"
